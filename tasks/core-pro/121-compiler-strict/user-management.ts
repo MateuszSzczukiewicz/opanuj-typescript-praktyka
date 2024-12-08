@@ -1,4 +1,4 @@
-import { UserModule } from './task.ts';
+import { UserModule, UserType } from './task.ts';
 
 const userModule = new UserModule();
 
@@ -8,4 +8,4 @@ userModule.addUser({ id: 3, name: 'Jim' });
 
 userModule.removeUser(2);
 
-userModule.filterUsers((user) => user.name.startsWith('J'));
+userModule.filterUsers((user: UserType) => user.name.startsWith('J'));

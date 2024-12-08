@@ -1,34 +1,40 @@
+export type UserType = {
+    id: number,
+    name: string,
+}
+
 export class UserModule {
-  private users = [];
 
-  addUser(user) {
-    this.users.push(user);
-  }
+    private users: UserType[] = [];
 
-  removeUser(userId) {
-    for (let i = 0; i < this.users.length; i++) {
-      if (this.users[i].id == userId) {
-        this.users.splice(i, 1);
-        break;
-      }
+    addUser(user: UserType) {
+        this.users.push(user);
     }
-  }
 
-  getUser(userId) {
-    for (let user of this.users) {
-      if (user.id == userId) {
-        return user;
-      }
+    removeUser(userId: number) {
+        for (let i = 0; i < this.users.length; i++) {
+            if (this.users[i].id == userId) {
+                this.users.splice(i, 1);
+                break;
+            }
+        }
     }
-    return null;
-  }
 
-  filterUsers(filterFn) {
-    return this.users.filter((user) => {
-      let result = filterFn(user);
-      return result.isValid;
-    });
-  }
+    getUser(userId: number) {
+        for (let user of this.users) {
+            if (user.id == userId) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    filterUsers(filterFn: Function) {
+        return this.users.filter((user) => {
+            let result = filterFn(user);
+            return result.isValid;
+        });
+    }
 }
 
 const userModule = new UserModule();
