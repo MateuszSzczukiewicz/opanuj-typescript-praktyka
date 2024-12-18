@@ -10,26 +10,30 @@ Twoim zadaniem jest:
 */
 
 type EmailNotification = {
-  type: 'email';
-  emailAddress: string;
-  content: string;
+    type: 'email';
+    emailAddress: string;
+    content: string;
 };
 
 type SMSNotification = {
-  type: 'sms';
-  phoneNumber: number;
-  message: string;
+    type: 'sms';
+    phoneNumber: number;
+    message: string;
 };
 
-type SystemNotification = { type: '' };
+type SystemNotification = { type: 'system'; log: string };
 
 type Notification = EmailNotification | SMSNotification | SystemNotification;
 
 // ❌ Ta funkcja wymaga poprawy:
 export function getNotificationText(notification: Notification): string {
-  if (notification.type === 'email') {
-    return notification.content;
-  }
+    if (notification.type === 'email') {
+        return notification.content;
+    } else if (notification.type === "sms") {
+        return notification.message
+    } else if (notification.type === "system") {
+        return notification.log
+    }
 
-  return ' ';
+    return 'Unknown notification';
 }

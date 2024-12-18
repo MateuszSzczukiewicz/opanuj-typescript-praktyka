@@ -8,22 +8,25 @@ Aby się z tym uporać, dodaj obsługę logowania nowego zdarzenia zgodnie z wzo
 */
 
 export type Event =
-  | { type: 'click'; x: number; y: number }
-  | { type: 'keydown'; key: string }
-  | { type: 'resize'; width: number; height: number };
+    | { type: 'click'; x: number; y: number }
+    | { type: 'keydown'; key: string }
+    | { type: 'resize'; width: number; height: number };
 
 export function handleEvent(event: Event) {
-  switch (event.type) {
-    case 'click':
-      console.log(`Kliknięto w punkcie (${event.x}, ${event.y})`);
-      break;
-    case 'keydown':
-      console.log(`Naciśnięto klawisz ${event.key}`);
-      break;
-    default:
-      const _exhaustiveCheck: never = event;
-      throw new Error(`Nieobsługiwane zdarzenie: ${JSON.stringify(_exhaustiveCheck)}`);
-  }
+    switch (event.type) {
+        case 'click':
+            console.log(`Kliknięto w punkcie (${event.x}, ${event.y})`);
+            break;
+        case 'keydown':
+            console.log(`Naciśnięto klawisz ${event.key}`);
+            break;
+        case 'resize':
+            console.log(`Zmieniono rozmiar na ${event.width}x${event.height}`)
+            break;
+        default:
+            const _exhaustiveCheck: never = event;
+            throw new Error(`Nieobsługiwane zdarzenie: ${JSON.stringify(_exhaustiveCheck)}`);
+    }
 }
 
 const resizeEvent: Event = { type: 'resize', width: 1024, height: 768 };
