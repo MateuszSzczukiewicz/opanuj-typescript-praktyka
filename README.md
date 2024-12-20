@@ -14,28 +14,36 @@ npm install
 
 ## 🚀 Praca z zadaniami
 
-### 📝 Uruchomienie zadania z modułu
+### 📝 Uruchomienie weryfikacji (wybór zadania z listy)
 
 ```bash
-npm run list core-pro
+npm run list <nazwa-modułu>  # core-pro lub react-pro
+```
+
+Tryb obserwatora (automatycznie ponawia testy po każdej zmianie w plikach):
+
+```bash
+npm run list <nazwa-modułu> -- --watch
+```
+
+### 🔍 Uruchomienie weryfikacji po nazwie zadania
+
+```bash
+npm run verify <nazwa-zadania> # np. 004-literals-code lub literals-code
 ```
 
 Tryb obserwatora:
 
 ```bash
-npm run list core-pro -- --watch
+npm run verify <nazwa-zadania> -- --watch
 ```
 
-### 🔍 Uruchomienie zadania wg nazwy
+### 🧑🏻‍💻 Uruchamianie środowiska developerskiego dla zadań React Pro
 
 ```bash
-npm run verify 004-literals-code
-```
+npm run dev # Uruchamia dashboard z wyborem wszystkich zadań
 
-Tryb obserwatora:
-
-```bash
-npm run verify 004-literals-code -- --watch
+npm run dev <nazwa-zadania> # Uruchamia konkretne zadanie, np. 211-type-props lub type-props
 ```
 
 ### 📊 Dashboard z podsumowaniem testów

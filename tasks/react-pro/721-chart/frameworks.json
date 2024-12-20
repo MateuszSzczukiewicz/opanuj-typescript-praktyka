@@ -1,0 +1,42 @@
+[
+  {
+    "name": "React",
+    "would_use_again": 65,
+    "would_not_use_again": 20,
+    "would_like_to_learn": 7,
+    "not_interested": 2,
+    "never_heard": 9
+  },
+  {
+    "name": "Vue.js",
+    "would_use_again": 38,
+    "would_not_use_again": 12,
+    "would_like_to_learn": 25,
+    "not_interested": 24,
+    "never_heard": 1
+  },
+  {
+    "name": "Angular",
+    "would_use_again": 20,
+    "would_not_use_again": 26,
+    "would_like_to_learn": 13,
+    "not_interested": 41,
+    "never_heard": 0
+  },
+  {
+    "name": "Svelte",
+    "would_use_again": 22,
+    "would_not_use_again": 0,
+    "would_like_to_learn": 48,
+    "not_interested": 22,
+    "never_heard": 8
+  },
+  {
+    "name": "Preact",
+    "would_use_again": 9,
+    "would_not_use_again": 5,
+    "would_like_to_learn": 24,
+    "not_interested": 46,
+    "never_heard": 16
+  }
+]

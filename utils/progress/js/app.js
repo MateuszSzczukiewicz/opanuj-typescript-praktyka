@@ -1,34 +1,48 @@
+const CORE_MODULE = 'core';
+const REACT_MODULE = 'react';
+
 const LEVEL_DEFINITIONS = {
-  '000': { name: 'Wstęp', level: 0 },
-  121: { name: 'Tajniki kompilatora', level: 1 },
-  122: { name: 'Tajniki kompilatora', level: 1 },
-  211: { name: 'System typów', level: 2 },
-  212: { name: 'System typów', level: 2 },
-  221: { name: 'System typów', level: 2 },
-  231: { name: 'System typów', level: 2 },
-  311: { name: 'Typy generyczne', level: 3 },
-  321: { name: 'Typy generyczne', level: 3 },
-  322: { name: 'Typy generyczne', level: 3 },
-  331: { name: 'Typy generyczne', level: 3 },
-  341: { name: 'Typy generyczne', level: 3 },
-  411: { name: 'Algebra typów', level: 4 },
-  412: { name: 'Algebra typów', level: 4 },
-  421: { name: 'Algebra typów', level: 4 },
-  422: { name: 'Algebra typów', level: 4 },
-  431: { name: 'Algebra typów', level: 4 },
-  441: { name: 'Algebra typów', level: 4 },
-  442: { name: 'Algebra typów', level: 4 },
-  611: { name: 'Wzorce w pracy z typami', level: 6 },
-  621: { name: 'Wzorce w pracy z typami', level: 6 },
-  622: { name: 'Wzorce w pracy z typami', level: 6 },
-  631: { name: 'Wzorce w pracy z typami', level: 6 },
-  632: { name: 'Wzorce w pracy z typami', level: 6 },
-  731: { name: 'JavaScript - Integracje', level: 7 },
+  [CORE_MODULE]: {
+    0: { name: 'Wstęp', level: 0 },
+    1: { name: 'Tajniki kompilatora', level: 1 },
+    2: { name: 'System typów', level: 2 },
+    3: { name: 'Typy generyczne', level: 3 },
+    4: { name: 'Algebra typów', level: 4 },
+    6: { name: 'Wzorce w pracy z typami', level: 6 },
+    7: { name: 'JavaScript - Integracje', level: 7 },
+  },
+  [REACT_MODULE]: {
+    0: { name: 'Wstęp', level: 0 },
+    1: { name: 'Konfiguracja projektu', level: 1 },
+    2: { name: 'Komponenty', level: 2 },
+    3: { name: 'Hooki', level: 3 },
+    4: { name: 'Zarządzanie stanem', level: 4 },
+    5: { name: 'Komunikacja z backendem', level: 5 },
+    6: { name: 'Wzorce w React', level: 6 },
+    7: { name: 'Aplikacje produkcyjne', level: 7 },
+  },
 };
 
-async function fetchResults() {
+async function initDashboard() {
+  const [coreResults, reactResults] = await Promise.all([
+    fetchResults(CORE_MODULE),
+    fetchResults(REACT_MODULE),
+  ]);
+  const tracker = await fetchTracker();
+
+  if (!coreResults || !reactResults) return;
+
+  renderOverallProgress(coreResults, reactResults, tracker);
+  renderChallenges(coreResults, CORE_MODULE, tracker);
+  renderChallenges(reactResults, REACT_MODULE, tracker);
+}
+
+// Initialize the dashboard when the page loads
+document.addEventListener('DOMContentLoaded', initDashboard);
+
+async function fetchResults(module) {
   try {
-    const response = await fetch('../data/results.json');
+    const response = await fetch(`../data/results-${module}.json`);
     return await response.json();
   } catch (error) {
     console.error('Error fetching results:', error);
@@ -36,12 +50,23 @@ async function fetchResults() {
   }
 }
 
-function renderOverallProgress(results) {
-  const challenges = getAllChallenges(results);
-  const completedChallenges = challenges.filter(
-    (challenge) => challenge.status === 'complete',
-  ).length;
-  const totalChallenges = challenges.length;
+async function fetchTracker() {
+  try {
+    const response = await fetch(`../data/verify-tracker.json`);
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching verify tracker:', error);
+    return null;
+  }
+}
+
+function renderOverallProgress(coreResults, reactResults, tracker) {
+  const coreStats = getChallengeStats(coreResults, CORE_MODULE, tracker);
+  const reactStats = getChallengeStats(reactResults, REACT_MODULE, tracker);
+
+  const completedChallenges = coreStats.completed + reactStats.completed;
+  const totalChallenges = coreStats.total + reactStats.total;
+
   const progressPercentage = Math.round((completedChallenges / totalChallenges) * 100);
 
   const progressHtml = `
@@ -64,6 +89,74 @@ function renderOverallProgress(results) {
   `;
 
   document.getElementById('overall-progress').innerHTML = progressHtml;
+}
+
+function getChallengeStats(results, moduleName, tracker) {
+  const challenges = getAllChallenges(results, moduleName, tracker);
+  const completedChallenges = challenges.filter(
+    (challenge) => challenge.status === 'complete',
+  ).length;
+
+  return {
+    challenges,
+    completed: completedChallenges,
+    total: challenges.length,
+  };
+}
+
+function getAllChallenges(results, moduleName, tracker) {
+  const challenges = [];
+
+  results.testResults.forEach((suite) => {
+    const levelCode = getChallengeLevel(suite.name);
+    if (levelCode && LEVEL_DEFINITIONS[moduleName][levelCode[0]]) {
+      const levelInfo = LEVEL_DEFINITIONS[moduleName][levelCode[0]];
+      const testDetails = getTestDetails(suite);
+      const passedTests = testDetails.filter((test) => test.status === 'passed').length;
+      const totalTests = testDetails.length;
+
+      const challengeName = suite.name
+        .split('/')
+        .pop()
+        .replace(/\.spec\.tsx?$/, '');
+
+      challenges.push({
+        name: challengeName,
+        level: levelInfo.level,
+        levelName: levelInfo.name,
+        levelCode,
+        passedTests,
+        totalTests,
+        status: getChallengeStatus(
+          { challengeName, moduleName },
+          { totalTests, passedTests },
+          tracker,
+        ),
+        testDetails,
+      });
+    }
+  });
+
+  return challenges.sort((a, b) => {
+    // First sort by level number
+    if (a.level !== b.level) {
+      return a.level - b.level;
+    }
+    // Then by level code for challenges within same level
+    return Number(a.levelCode) - Number(b.levelCode);
+  });
+}
+
+function getChallengeStatus(challenge, tests, tracker) {
+  const moduleName = challenge.moduleName;
+  const challengeName = challenge.challengeName;
+  const challengeInTracker = tracker && tracker[moduleName][challengeName];
+
+  return tests.passedTests === tests.totalTests
+    ? 'complete'
+    : tests.passedTests > 0 && challengeInTracker
+      ? 'partial'
+      : 'incomplete';
 }
 
 function getChallengeLevel(testName) {
@@ -89,39 +182,66 @@ function getTestDetails(suite) {
   }));
 }
 
-function getAllChallenges(results) {
-  const challenges = [];
+function renderChallenges(results, moduleName, tracker) {
+  const container = document.getElementById(`levels-${moduleName}`);
+  const challenges = getAllChallenges(results, moduleName, tracker);
 
-  results.testResults.forEach((suite) => {
-    const levelCode = getChallengeLevel(suite.name);
-    if (levelCode && LEVEL_DEFINITIONS[levelCode]) {
-      const levelInfo = LEVEL_DEFINITIONS[levelCode];
-      const testDetails = getTestDetails(suite);
-      const passedTests = testDetails.filter((test) => test.status === 'passed').length;
-      const totalTests = testDetails.length;
+  const gridHtml = `
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      ${challenges
+        .map(
+          (challenge, idx) => `
+          <div class="challenge-card rounded-xl ${getStatusColor(
+            challenge.status,
+          )} card-hover aspect-square flex flex-col">
+            <div class="p-4 flex-1 cursor-pointer flex flex-col" onclick="toggleTestDetails('${moduleName}', '${idx}')">
+              <div class="flex flex-col gap-2 mb-4">
+                <div class="text-blue-400/80 text-xs font-medium tracking-wider">${challenge.levelName}</div>
+                <div class="flex items-start justify-between gap-2">
+                  <h3 class="font-medium text-white/90 uppercase tracking-wide text-sm">${
+                    challenge.name
+                  }</h3>
+                  <span class="text-lg shrink-0" title="${challenge.status}">${getStatusIcon(
+                    challenge.status,
+                  )}</span>
+                </div>
+              </div>
+              <div class="mt-auto">
+                <div class="bg-black/30 rounded-full h-1.5 w-full mb-2 overflow-hidden">
+                  <div class="bg-current rounded-full h-1.5 transition-all duration-500"
+                       style="width: ${(challenge.passedTests / challenge.totalTests) * 100}%"></div>
+                </div>
+                <div class="text-sm font-medium text-center">
+                  Progress: ${challenge.passedTests}/${challenge.totalTests}
+                </div>
+              </div>
+            </div>
+            <div id="details-${moduleName}-${idx}" class="hidden border-t border-white/5">
+              <div class="p-4 space-y-2 max-h-48 overflow-y-auto">
+                ${challenge.testDetails
+                  .map(
+                    (test) => `
+                    <div class="flex items-center justify-between gap-2 text-sm">
+                      <span class="text-white/70 truncate">${test.name}</span>
+                      <span class="${
+                        test.status === 'passed' ? 'text-lime-400' : 'text-slate-400'
+                      } shrink-0">${getStatusIcon(
+                        test.status === 'passed' ? 'complete' : 'incomplete',
+                      )}</span>
+                    </div>
+                  `,
+                  )
+                  .join('')}
+              </div>
+            </div>
+          </div>
+        `,
+        )
+        .join('')}
+    </div>
+  `;
 
-      challenges.push({
-        name: suite.name.split('/').pop().replace('.spec.ts', ''),
-        level: levelInfo.level,
-        levelName: levelInfo.name,
-        levelCode,
-        passedTests,
-        totalTests,
-        status:
-          passedTests === totalTests ? 'complete' : passedTests > 0 ? 'partial' : 'incomplete',
-        testDetails,
-      });
-    }
-  });
-
-  return challenges.sort((a, b) => {
-    // First sort by level number
-    if (a.level !== b.level) {
-      return a.level - b.level;
-    }
-    // Then by level code for challenges within same level
-    return Number(a.levelCode) - Number(b.levelCode);
-  });
+  container.innerHTML = gridHtml;
 }
 
 function getStatusColor(status) {
@@ -154,8 +274,8 @@ function getStatusIcon(status) {
   }
 }
 
-function toggleTestDetails(cardId) {
-  const detailsElement = document.getElementById(`details-${cardId}`);
+function toggleTestDetails(moduleName, cardId) {
+  const detailsElement = document.getElementById(`details-${moduleName}-${cardId}`);
   const isExpanded = detailsElement.classList.contains('hidden');
 
   if (isExpanded) {
@@ -164,76 +284,3 @@ function toggleTestDetails(cardId) {
     detailsElement.classList.add('hidden');
   }
 }
-
-function renderChallenges(results) {
-  const container = document.getElementById('levels');
-  const challenges = getAllChallenges(results);
-
-  const gridHtml = `
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-      ${challenges
-        .map(
-          (challenge, idx) => `
-          <div class="challenge-card rounded-xl ${getStatusColor(
-            challenge.status,
-          )} card-hover aspect-square flex flex-col">
-            <div class="p-4 flex-1 cursor-pointer flex flex-col" onclick="toggleTestDetails('${idx}')">
-              <div class="flex flex-col gap-2 mb-4">
-                <div class="text-blue-400/80 text-xs font-medium tracking-wider">${challenge.levelName}</div>
-                <div class="flex items-start justify-between gap-2">
-                  <h3 class="font-medium text-white/90 uppercase tracking-wide text-sm">${
-                    challenge.name
-                  }</h3>
-                  <span class="text-lg shrink-0" title="${challenge.status}">${getStatusIcon(
-                    challenge.status,
-                  )}</span>
-                </div>
-              </div>
-              <div class="mt-auto">
-                <div class="bg-black/30 rounded-full h-1.5 w-full mb-2 overflow-hidden">
-                  <div class="bg-current rounded-full h-1.5 transition-all duration-500"
-                       style="width: ${(challenge.passedTests / challenge.totalTests) * 100}%"></div>
-                </div>
-                <div class="text-sm font-medium text-center">
-                  Progress: ${challenge.passedTests}/${challenge.totalTests}
-                </div>
-              </div>
-            </div>
-            <div id="details-${idx}" class="hidden border-t border-white/5">
-              <div class="p-4 space-y-2 max-h-48 overflow-y-auto">
-                ${challenge.testDetails
-                  .map(
-                    (test) => `
-                    <div class="flex items-center justify-between gap-2 text-sm">
-                      <span class="text-white/70 truncate">${test.name}</span>
-                      <span class="${
-                        test.status === 'passed' ? 'text-lime-400' : 'text-slate-400'
-                      } shrink-0">${getStatusIcon(
-                        test.status === 'passed' ? 'complete' : 'incomplete',
-                      )}</span>
-                    </div>
-                  `,
-                  )
-                  .join('')}
-              </div>
-            </div>
-          </div>
-        `,
-        )
-        .join('')}
-    </div>
-  `;
-
-  container.innerHTML = gridHtml;
-}
-
-async function initDashboard() {
-  const results = await fetchResults();
-  if (!results) return;
-
-  renderOverallProgress(results);
-  renderChallenges(results);
-}
-
-// Initialize the dashboard when the page loads
-document.addEventListener('DOMContentLoaded', initDashboard);

@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: DALL-E Image Generation API
+  version: 1.0.0
+servers:
+  - url: https://api.openai.com/v1
+paths:
+  /images/generations:
+    post:
+      summary: Generate images using DALL-E model
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - prompt
+              properties:
+                model:
+                  type: string
+                  description: The DALL-E model to use
+                  example: dall-e-3
+                prompt:
+                  type: string
+                  description: Text description of the desired image
+                  example: a white siamese cat
+                n:
+                  type: integer
+                  description: Number of images to generate
+                  minimum: 1
+                  maximum: 10
+                  default: 1
+                size:
+                  type: string
+                  description: Size of the generated images
+                  enum: [1024x1024, 1024x1792, 1792x1024]
+                  default: 1024x1024
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: integer
+                    description: Unix timestamp of when the request was created
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                          description: URL of the generated image
+                          example: https://oaidalleapiprodscus.blob.core.windows.net/private/...
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Invalid request
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Invalid authentication
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

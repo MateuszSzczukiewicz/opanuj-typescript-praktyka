@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { glob } from 'glob';
+import { suppressViteSourceMapWarning } from './scripts/helpers.ts';
 import { startTest } from './scripts/test-runner.ts';
 
 const program = new Command();
@@ -24,7 +25,9 @@ program
         process.exit(1);
       }
 
-      await startTest(`${allPaths[0]}`, { watch: options.watch });
+      await suppressViteSourceMapWarning(() =>
+        startTest(`${allPaths[0]}`, { watch: options.watch }),
+      );
     } catch (error) {
       console.error(`\n❌ Nieoczekiwany błąd :(\n\n ${error}`);
       process.exit(1);

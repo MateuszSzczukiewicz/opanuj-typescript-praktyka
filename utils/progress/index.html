@@ -31,12 +31,12 @@
   <body
     class="bg-gray-800 bg-gradient-to-t from-gray-900 to-gray-950/50 min-h-screen text-[#E4E4E4] antialiased"
   >
-    <div class="container mx-auto px-4 py-12">
+    <div class="container px-4 py-12 mx-auto">
       <header class="mb-16">
         <div class="flex items-center justify-between gap-3 mb-3">
           <div>
-            <h1 class="text-5xl font-bold text-blue-400 tracking-tight">Opanuj TypeScript</h1>
-            <p class="text-gray-400 text-lg font-light tracking-wide">Przeprogramowani.pl</p>
+            <h1 class="text-5xl font-bold tracking-tight text-blue-400">Opanuj TypeScript</h1>
+            <p class="text-lg font-light tracking-wide text-gray-400">Przeprogramowani.pl</p>
           </div>
           <div>
             <img src="img/logo-vertical.png" alt="Przeprogramowani.pl" class="w-48" />
@@ -49,15 +49,19 @@
       </header>
 
       <main>
-        <h1 class="text-2xl text-white tracking-tight mb-4">Opanuj Typescript: Core Pro</h1>
-        <div id="levels" class="space-y-20">
+        <h1 class="mb-4 text-2xl tracking-tight text-white">Core Pro</h1>
+        <div id="levels-core" class="space-y-20">
+          <!-- Level cards will be inserted here -->
+        </div>
+        <h1 class="mt-6 mb-4 text-2xl tracking-tight text-white">React Pro</h1>
+        <div id="levels-react" class="space-y-20">
           <!-- Level cards will be inserted here -->
         </div>
       </main>
     </div>
-    <footer class="bg-gray-900 mt-12 border-t border-gray-800">
-      <div class="max-w-screen-xl mx-auto py-12 px-4 overflow-hidden space-y-8 sm_px-6 lg_px-8">
-        <nav class="-mx-5 -my-2 flex flex-wrap justify-center">
+    <footer class="mt-12 bg-gray-900 border-t border-gray-800">
+      <div class="max-w-screen-xl px-4 py-12 mx-auto space-y-8 overflow-hidden sm_px-6 lg_px-8">
+        <nav class="flex flex-wrap justify-center -mx-5 -my-2">
           <div class="px-5 py-2">
             <a
               class="text-base leading-6 text-gray-300 hover_text-white"
@@ -96,12 +100,12 @@
             >
           </div>
         </nav>
-        <div class="mt-8 flex justify-center space-x-3">
+        <div class="flex justify-center mt-8 space-x-3">
           <a
             class="text-gray-400 hover_text-gray-300"
             href="https://www.facebook.com/przeprogramowani"
             ><span class="sr-only">Facebook</span
-            ><svg class="h-6 w-6" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
+            ><svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 24 24">
               <path
                 fill-rule="evenodd"
                 d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
@@ -112,7 +116,7 @@
             href="https://www.instagram.com/przeprogramowani"
             ><span class="sr-only">Instagram</span
             ><svg
-              class="h-6 w-6"
+              class="w-6 h-6"
               xmlns="http://www.w3.org/2000/svg"
               aria-hidden="true"
               fill="currentColor"
@@ -126,7 +130,7 @@
           ><a class="text-gray-400 hover_text-gray-300" href="mailto:kontakt@przeprogramowani.pl"
             ><span class="sr-only">Mail</span
             ><svg
-              class="h-6 w-6"
+              class="w-6 h-6"
               aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -141,7 +145,7 @@
               ></path></svg
           ></a>
         </div>
-        <p class="mt-8 text-center text-base leading-6 text-gray-400">
+        <p class="mt-8 text-base leading-6 text-center text-gray-400">
           Przeprogramowani.pl - Szersze spojrzenie na programowanie
         </p>
       </div>
