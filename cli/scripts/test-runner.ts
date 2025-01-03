@@ -9,7 +9,12 @@ function getTaskName(pathToTask: string) {
 }
 
 async function runVitest(pathToTask: string, options: TestOptions) {
-  const vitest = await startVitest('test', [pathToTask], { run: !options.watch, watch: options.watch });
+  const isReactTask = pathToTask.includes('react');
+  const vitest = await startVitest('test', [pathToTask], {
+    run: !options.watch,
+    watch: options.watch,
+    config: isReactTask ? 'vitest.config.react.ts' : 'vitest.config.node.ts',
+  });
 
   if (!vitest) {
     throw new Error(`❌ Nie udało się uruchomić testów - poinformuj nas o tym."`);

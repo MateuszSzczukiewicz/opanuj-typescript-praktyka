@@ -16,6 +16,12 @@ const getTsConfig = (searchPath?: string): CompilerOptions => {
     ? path.resolve(path.dirname(searchPath), 'tsconfig.json')
     : path.resolve(process.cwd(), 'tsconfig.json');
 
+  // Check if it's a react-pro task, and if so, try to find the tsconfig in react-pro dir
+  if (!sys.fileExists(configPath) && searchPath?.includes('react-pro')) {
+    const reactProPath = searchPath.split('react-pro')[0] + 'react-pro';
+    configPath = path.resolve(reactProPath, 'tsconfig.json');
+  }
+
   // If local tsconfig doesn't exist, fall back to root tsconfig
   if (searchPath && !sys.fileExists(configPath)) {
     configPath = path.resolve(process.cwd(), 'tsconfig.json');
