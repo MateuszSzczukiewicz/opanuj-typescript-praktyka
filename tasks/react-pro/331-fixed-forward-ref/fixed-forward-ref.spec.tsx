@@ -41,7 +41,7 @@ describe('Fixed forward ref', () => {
     expect(submittedData).toHaveTextContent('Test bio');
   });
 
-  test('should prevent adding extra properties to state', async () => {
+  test('should prevent adding extra properties to props', async () => {
     const fileContent = await fsPromises.readFile(join(__dirname, 'fixed-forward-ref.ts'), 'utf8');
     const refInferenceGeneric = Buffer.from('52656641747472696275746573', 'hex').toString(); // encoded type to prevent spoiler
     try {

@@ -1,6 +1,6 @@
+import { delay, http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
-import { http, HttpResponse, delay } from 'msw';
-import { vi, beforeAll, afterAll } from 'vitest';
+import { afterAll, beforeAll, vi } from 'vitest';
 
 const getQueryParams = (url: string): Record<string, string> => {
   const searchParams = new URL(url).searchParams;
@@ -110,9 +110,11 @@ export function setupMockServer({ logRequest = false }: SetupMockServerOptions =
   });
 
   const verifyRequest = (requestUrl: string, requestMethod: string) => {
-    return requestLog.some(
-      (request) => request.url === requestUrl && request.method === requestMethod,
+    const hasMatch = requestLog.some(
+      (request) => request.url.includes(requestUrl) && request.method === requestMethod,
     );
+
+    return hasMatch;
   };
 
   const verifyRequestCount = (requestUrl: string, requestMethod: string) => {

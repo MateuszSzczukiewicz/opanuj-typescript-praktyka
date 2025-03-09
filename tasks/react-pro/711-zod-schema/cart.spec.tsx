@@ -1,9 +1,9 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { join } from 'path';
 import { describe, test } from 'vitest';
 import { getCompilerDiagnostics } from '../../../utils/ts-utils';
 import App from './App.tsx';
-import userEvent from '@testing-library/user-event';
 
 const PAGE_SELECTORS = {
   ADD_ITEM_BUTTON: 'add-item-button',
@@ -15,7 +15,7 @@ const PAGE_SELECTORS = {
   ITEM_NAME: 'item-name',
   ITEM_PRICE: 'item-price',
   ITEM_QUANTITY: 'item-quantity',
-}
+};
 
 describe('Cart Form with Zod', () => {
   test('should compile', () => {
@@ -55,7 +55,9 @@ describe('Cart Form with Zod', () => {
     const submitButton = await screen.findByTestId(PAGE_SELECTORS.SUBMIT_BUTTON);
     await userEvent.click(submitButton);
 
-    expect(screen.getByText('Łączna cena nie zgadza się z wartością produktów')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Łączna cena nie zgadza się z wartością produktów'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Koszyk został wysłany!')).toBeInTheDocument();
   });
 });
